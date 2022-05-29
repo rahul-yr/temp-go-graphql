@@ -39,25 +39,54 @@ var rootQuery = graphql.NewObject(
 					return data, nil
 				},
 			},
-			// "getById": &graphql.Field{
-			// 	Type:        fakeJSONObjectConf,
-			// 	Description: "Get fake json object by id",
-			// 	Args: graphql.FieldConfigArgument{
-			// 		"id": &graphql.ArgumentConfig{
-			// 			Type: graphql.Int,
-			// 		},
-			// 	},
-			// 	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			// 		id := p.Args["id"].(int)
-			// 		return getFakeJSONObjectById(id), nil
-			// 	},
-			// },
+			"getbyId": &graphql.Field{
+				Type:        fakeJSONObjectConf,
+				Description: "Get fake json object by id",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.Int,
+					},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					id := p.Args["id"].(int)
+					data, err := getFakeJSONObjectById(id)
+					if err != nil {
+						return nil, err
+					}
+					return data, nil
+				},
+			},
+		},
+	},
+)
+
+var rootMutation = graphql.NewObject(
+	graphql.ObjectConfig{
+		Name: "RootMutation",
+		Fields: graphql.Fields{
+			"delete": &graphql.Field{
+				Type: graphql.Boolean,
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.Int,
+					},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					id := p.Args["id"].(int)
+					err := deleteTodoItem(id)
+					if err != nil {
+						return nil, err
+					}
+					return true, nil
+				},
+			},
 		},
 	},
 )
 
 var Schema, _ = graphql.NewSchema(
 	graphql.SchemaConfig{
-		Query: rootQuery,
+		Query:    rootQuery,
+		Mutation: rootMutation,
 	},
 )
